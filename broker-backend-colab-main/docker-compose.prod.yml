@@ -1,0 +1,6 @@
+version: '3.8'
+
+services:
+  backend:
+    env_file:
+      - .env.production  # Archivo con configuración específica para producción

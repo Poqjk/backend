@@ -1,0 +1,27 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main # Cambia si usas otra rama principal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Checkout del código
+        uses: actions/checkout@v3
+
+      - name: 🔑 Configurar SSH y conectarse a EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/broker-backend-colab  # Asegúrate de que es la ruta correcta en tu EC2
+            git pull origin main  # Baja los últimos cambios
+            docker-compose down  # Detiene los contenedores actuales
+            docker-compose up --build -d  # Vuelve a construir y levantar el backend
+            docker system prune -af  # Limpia imágenes no usadas

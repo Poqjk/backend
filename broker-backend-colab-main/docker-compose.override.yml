@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    ports:
+      - "5050:80"  # pgAdmin se expondrá en el puerto 5050 de tu máquina
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com   # Cambia por tu email deseado
+      PGADMIN_DEFAULT_PASSWORD: admin            # Cambia por una contraseña segura
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
